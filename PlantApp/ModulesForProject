@@ -1,0 +1,2 @@
+Modules: 
+npm install expo react-native react-native-vector-icons react-native-slider react-navigation react-navigation-tabs react-navigation-stack react-native-gesture-handler @react-native-community/masked-view react-native-screens react-native-reanimated
