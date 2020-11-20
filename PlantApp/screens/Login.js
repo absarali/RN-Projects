@@ -1,35 +1,52 @@
 import React, { Component } from "react";
-import { StyleSheet, Text, View, KeyboardAvoidingView } from "react-native";
-import { Button, Block, Text, Input } from "../components";
+import {
+  ActivityIndicator,
+  Keyboard,
+  KeyboardAvoidingView,
+  StyleSheet
+} from "react-native";
+
+import { Button, Block, Input, Text } from "../components";
 import { theme } from "../constants";
 
+const VALID_EMAIL = "contact@react-ui-kit.com";
+const VALID_PASSWORD = "subscribe";
+
 export default class Login extends Component {
-  static navigationOptions = {};
   state = {
-    email: "contact@react-ui-kit.com",
-    password: "youtube",
+    email: VALID_EMAIL,
+    password: VALID_PASSWORD,
+    errors: [],
+    loading: false
   };
+
   handleLogin() {
     const { navigation } = this.props;
     const { email, password } = this.state;
+    const errors = [];
+
+    Keyboard.dismiss();
     this.setState({ loading: true });
-    if (email !== "contact@react-ui-kit.com") {
+
+    if (email !== VALID_EMAIL) {
       errors.push("email");
     }
-    if (password !== "subscribe") {
+    if (password !== VALID_PASSWORD) {
       errors.push("password");
     }
-    if (errors.length) {
-      this.setState({ errors, loading: false });
-    } else {
-      this.setState({ loading: false });
+
+    this.setState({ errors, loading: false });
+
+    if (!errors.length) {
       navigation.navigate("Browse");
     }
   }
+
   render() {
     const { navigation } = this.props;
     const { loading, errors } = this.state;
-    const hasErrors = (key) => (errors.includes(key) ? styles.hasErrors : null);
+    const hasErrors = key => (errors.includes(key) ? styles.hasErrors : null);
+
     return (
       <KeyboardAvoidingView style={styles.login} behavior="padding">
         <Block padding={[0, theme.sizes.base * 2]}>
@@ -39,27 +56,39 @@ export default class Login extends Component {
           <Block middle>
             <Input
               label="Email"
-              style={styles.input}
+              error={hasErrors("email")}
+              style={[styles.input, hasErrors("email")]}
               defaultValue={this.state.email}
-              onChangeText={(text) => this.setState({ email: text })}
+              onChangeText={text => this.setState({ email: text })}
             />
             <Input
               secure
               label="Password"
-              style={styles.input}
+              error={hasErrors("password")}
+              style={[styles.input, hasErrors("password")]}
               defaultValue={this.state.password}
-              onChangeText={(text) => this.setState({ password: text })}
+              onChangeText={text => this.setState({ password: text })}
             />
-            <Button
-              onPress={() => {
-                this.handleLogin();
-              }}
-            />
-            <Button
-              onPress={() => {
-                this.handleLogin();
-              }}
-            />
+            <Button gradient onPress={() => this.handleLogin()}>
+              {loading ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <Text bold white center>
+                  Login
+                </Text>
+              )}
+            </Button>
+
+            <Button onPress={() => navigation.navigate("Forgot")}>
+              <Text
+                gray
+                caption
+                center
+                style={{ textDecorationLine: "underline" }}
+              >
+                Forgot your password?
+              </Text>
+            </Button>
           </Block>
         </Block>
       </KeyboardAvoidingView>
@@ -68,11 +97,17 @@ export default class Login extends Component {
 }
 
 const styles = StyleSheet.create({
-  input: {
-    borderColor: "transparent",
-    borderWidth: 0,
-    borderRadius: 0,
-    borderBottomColor: theme.colors.gray2,
+  login: {
+    flex: 1,
+    justifyContent: "center"
   },
-  login: {},
+  input: {
+    borderRadius: 0,
+    borderWidth: 0,
+    borderBottomColor: theme.colors.gray2,
+    borderBottomWidth: StyleSheet.hairlineWidth
+  },
+  hasErrors: {
+    borderBottomColor: theme.colors.accent
+  }
 });
